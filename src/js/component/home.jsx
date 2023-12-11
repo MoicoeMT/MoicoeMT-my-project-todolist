@@ -5,9 +5,9 @@ import Input from "./input";
 const Home = () => {
   return (
     <>
-	<div className="container m-5">
-	<Input />
-	</div>
+      <div id="container1" className="container">
+        <Input />
+      </div>
     </>
   );
 };
