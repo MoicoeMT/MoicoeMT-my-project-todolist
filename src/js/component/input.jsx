@@ -1,12 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Input = () => {
   const [listValue, setListValue] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const endpoint = 'https://playground.4geeks.com/apis/fake/todos/user/MoicoeMT'
+
+  const getApi = async () =>{
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    setListValue(data);
+  }
+
+  const addtask = async (task) => {
+    const response = await fetch(endpoint, {
+      method:'PUT',
+      body:JSON.stringify(task),
+      headers:{
+        'Content-Type':'application/json',
+      }
+    })
+    getApi();
+  }
+
+  useEffect(()=> {
+    getApi();
+  },[])
 
   const handleClick = () => {
-    setListValue([...listValue, inputValue]);
+    if(inputValue.trim() === ""){
+      return alert("Add a task first")
+    }
+    const newTask = [...listValue, {done:false, label:inputValue}];
     setInputValue("");
+    setListValue(newTask);
+    addtask(newTask);
   };
 
   const handleChange = (event) => {
@@ -23,9 +50,8 @@ const Input = () => {
   const removeItem = (id) => {
     const removedItem = listValue.filter((item, index) => index !== id);
     setListValue(removedItem);
+    addtask(removedItem);
   };
-
-  
 
   return (
     <>
@@ -41,7 +67,7 @@ const Input = () => {
             type="text"
             className="form-control"
             id="formGroupExampleInput"
-            placeholder="Add your task"
+            placeholder="Add a new task"
             onChange={handleChange}
             onKeyDown={handlePress}
           />
@@ -55,14 +81,13 @@ const Input = () => {
               <div key={index}>
                 <div
                   id="contcard"
-                  className="container d-flex justify-content-between p-1 px-2"
+                  className="container d-flex justify-content-between p-2 px-2"
                 >
-                  <h5 className="my-1">{listItem}</h5>
+                  <h5 className="my-1">{listItem.label}</h5>
                   <button
                     id="secondbutton"
                     className="btn btn-danger"
-                    onClick={() => removeItem(index)}
-                    
+                    onClick={() => removeItem(index)}                   
                   >
                     <i className="fa-solid fa-trash-can"></i>
                   </button>
@@ -71,6 +96,8 @@ const Input = () => {
               </div>
             );
           })}
+          <hr className="m-0 p-0 bg-light"/>
+          <h5 className="p-2 my-1 text-center"><i class="fa-solid fa-address-book"></i> Total: {listValue.length}</h5>
         </div>
       </div>
     </>
